@@ -31,46 +31,9 @@ const MEMBERS = [
 const MODULES = ['Frontend', 'Backend', 'RAG', 'ML/AI', 'DevOps', 'Data', 'Design', 'Docs'];
 
 // ─── Default Tasks (CS221 Project) ───
-const DEFAULT_TASKS = [
-    // ── DATA PIPELINE ──
-    { id: 't1', name: 'Crawl dữ liệu truyện tranh (Scrapy)', desc: 'Viết spider crawl reviews, nhân vật, cốt truyện từ các web truyện tranh', member: 'member1', priority: 'high', module: 'Data', status: 'todo', deadline: '2026-03-15' },
-    { id: 't2', name: 'Xử lý & làm sạch dữ liệu', desc: 'Python script chuẩn hóa format, loại bỏ noise, dedup', member: 'member1', priority: 'medium', module: 'Data', status: 'todo', deadline: '2026-03-18' },
-    { id: 't3', name: 'Chunking & tạo embeddings (bge-m3)', desc: 'Chia văn bản thành chunks tối ưu, tạo vector embeddings', member: 'member1', priority: 'high', module: 'RAG', status: 'todo', deadline: '2026-03-20' },
-    { id: 't4', name: 'Setup ChromaDB & load vectors', desc: 'Cấu hình ChromaDB, load embeddings, test similarity search', member: 'member1', priority: 'medium', module: 'RAG', status: 'todo', deadline: '2026-03-22' },
+const DEFAULT_TASKS = [];
 
-    // ── ML/AI MODELS ──
-    { id: 't5', name: 'Fine-tune PhoBERT (Intent Classification)', desc: 'Chuẩn bị dataset, train PhoBERT phân loại: comic / psychology / chitchat', member: 'member2', priority: 'high', module: 'ML/AI', status: 'todo', deadline: '2026-03-20' },
-    { id: 't6', name: 'Fine-tune PhoBERT (Sentiment Analysis)', desc: 'Train PhoBERT nhận diện cảm xúc: positive/negative/anger/sadness/joy', member: 'member2', priority: 'high', module: 'ML/AI', status: 'todo', deadline: '2026-03-25' },
-    { id: 't7', name: 'Tích hợp ViT (Vision Transformer)', desc: 'Nghiên cứu paper ViT, implement tiền xử lý ảnh truyện tranh', member: 'member2', priority: 'medium', module: 'ML/AI', status: 'todo', deadline: '2026-03-28' },
-    { id: 't8', name: 'Setup MLflow tracking', desc: 'Cấu hình MLflow server, log experiments, model registry', member: 'member2', priority: 'medium', module: 'ML/AI', status: 'todo', deadline: '2026-03-15' },
 
-    // ── BACKEND ──
-    { id: 't9', name: 'Setup FastAPI + WebSocket', desc: 'Khởi tạo project FastAPI, cấu hình CORS, WebSocket endpoint cho streaming', member: 'member3', priority: 'high', module: 'Backend', status: 'todo', deadline: '2026-03-12' },
-    { id: 't10', name: 'Xây dựng LangGraph Router Agent', desc: 'Implement Router Agent điều hướng intent đến comic/psychology module', member: 'member3', priority: 'high', module: 'Backend', status: 'todo', deadline: '2026-03-22' },
-    { id: 't11', name: 'Xây dựng RAG Pipeline', desc: 'Kết nối Retriever + Re-ranker + LLM, tích hợp Tavily search nhân vật', member: 'member3', priority: 'high', module: 'RAG', status: 'todo', deadline: '2026-03-28' },
-    { id: 't12', name: 'Xây dựng Context Manager (Memory)', desc: 'Quản lý lịch sử hội thoại, session với Redis + PostgreSQL', member: 'member3', priority: 'medium', module: 'Backend', status: 'todo', deadline: '2026-03-25' },
-    { id: 't13', name: 'Tích hợp LLM API (GPT/Gemini)', desc: 'Kết nối OpenAI/Gemini API, streaming response, prompt engineering', member: 'member3', priority: 'medium', module: 'Backend', status: 'todo', deadline: '2026-03-18' },
-
-    // ── FRONTEND ──
-    { id: 't14', name: 'Setup React + Vite + TypeScript', desc: 'Khởi tạo project, cấu hình TailwindCSS, shadcn/ui, Framer Motion', member: 'member4', priority: 'high', module: 'Frontend', status: 'todo', deadline: '2026-03-12' },
-    { id: 't15', name: 'Xây dựng Chat Interface', desc: 'ChatBubble, ChatInput (text + image upload), TypingIndicator, streaming render', member: 'member4', priority: 'high', module: 'Frontend', status: 'todo', deadline: '2026-03-20' },
-    { id: 't16', name: 'Xây dựng Sidebar & History', desc: 'Conversation list, search, grouped by date, pin conversations', member: 'member4', priority: 'medium', module: 'Frontend', status: 'todo', deadline: '2026-03-22' },
-    { id: 't17', name: 'EmotionBadge & Source Cards', desc: 'Component hiển thị cảm xúc detected, RAG source references', member: 'member4', priority: 'medium', module: 'Frontend', status: 'todo', deadline: '2026-03-25' },
-    { id: 't18', name: 'WebSocket client + Zustand store', desc: 'Real-time streaming, global state management, API client', member: 'member4', priority: 'high', module: 'Frontend', status: 'todo', deadline: '2026-03-18' },
-
-    // ── DEVOPS ──
-    { id: 't19', name: 'Dockerize backend & frontend', desc: 'Viết Dockerfile cho FastAPI + React, docker-compose cho dev', member: 'member1', priority: 'medium', module: 'DevOps', status: 'todo', deadline: '2026-04-01' },
-    { id: 't20', name: 'Setup Kubernetes (EKS) + Istio', desc: 'Cấu hình K8s manifests, Istio service mesh, Ingress', member: 'member1', priority: 'medium', module: 'DevOps', status: 'todo', deadline: '2026-04-05' },
-    { id: 't21', name: 'CI/CD với GitHub Actions', desc: 'Pipeline: test → build → push ECR → deploy K8s', member: 'member3', priority: 'medium', module: 'DevOps', status: 'todo', deadline: '2026-04-05' },
-    { id: 't22', name: 'Setup Prometheus + Grafana + ELK', desc: 'Monitoring metrics, dashboards, centralized logging', member: 'member1', priority: 'low', module: 'DevOps', status: 'todo', deadline: '2026-04-08' },
-
-    // ── DOCS ──
-    { id: 't23', name: 'Viết báo cáo đồ án', desc: 'Tài liệu mô tả kiến trúc, thuật toán, kết quả thực nghiệm', member: 'member2', priority: 'medium', module: 'Docs', status: 'todo', deadline: '2026-04-15' },
-    { id: 't24', name: 'Chuẩn bị slide thuyết trình', desc: 'Slides demo hệ thống, kiến trúc, kết quả', member: 'member4', priority: 'medium', module: 'Docs', status: 'todo', deadline: '2026-04-18' },
-
-    // ── AIRFLOW ──
-    { id: 't25', name: 'Setup Apache Airflow DAGs', desc: 'DAGs điều phối: crawl → clean → embed → train tự động', member: 'member1', priority: 'low', module: 'DevOps', status: 'todo', deadline: '2026-04-01' },
-];
 
 // ─── State ───
 let tasks = [];
