@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS221 — Task Board | Multi-Task Agent Chatbot</title>
+    <meta name="description" content="Bảng quản lý công việc cho dự án CS221 - Hệ thống Agent Chatbot Đa Tác Vụ">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">🤖</span>
+                <div>
+                    <h1 class="logo-title">CS221 Task Board</h1>
+                    <p class="logo-subtitle">Hệ thống Agent Chatbot Đa Tác Vụ</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="team-avatars" id="teamAvatars"></div>
+        </div>
+        <div class="header-right">
+            <div class="stats" id="stats"></div>
+            <button class="btn btn-primary" id="addTaskBtn" onclick="openModal()">
+                <span>＋</span> Thêm Task
+            </button>
+        </div>
+    </header>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label>Lọc theo người:</label>
+            <div class="filter-chips" id="memberFilters"></div>
+        </div>
+        <div class="filter-group">
+            <label>Lọc theo module:</label>
+            <div class="filter-chips" id="moduleFilters"></div>
+        </div>
+    </div>
+
+    <!-- Board -->
+    <main class="board" id="board">
+        <div class="column" data-status="todo">
+            <div class="column-header">
+                <div class="column-title">
+                    <span class="column-dot dot-todo"></span>
+                    <h2>📋 To Do</h2>
+                    <span class="column-count" id="count-todo">0</span>
+                </div>
+            </div>
+            <div class="task-list" id="list-todo" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+
+        <div class="column" data-status="in-progress">
+            <div class="column-header">
+                <div class="column-title">
+                    <span class="column-dot dot-progress"></span>
+                    <h2>🔨 In Progress</h2>
+                    <span class="column-count" id="count-in-progress">0</span>
+                </div>
+            </div>
+            <div class="task-list" id="list-in-progress" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+
+        <div class="column" data-status="review">
+            <div class="column-header">
+                <div class="column-title">
+                    <span class="column-dot dot-review"></span>
+                    <h2>👀 Review</h2>
+                    <span class="column-count" id="count-review">0</span>
+                </div>
+            </div>
+            <div class="task-list" id="list-review" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+
+        <div class="column" data-status="done">
+            <div class="column-header">
+                <div class="column-title">
+                    <span class="column-dot dot-done"></span>
+                    <h2>✅ Done</h2>
+                    <span class="column-count" id="count-done">0</span>
+                </div>
+            </div>
+            <div class="task-list" id="list-done" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+        </div>
+    </main>
+
+    <!-- Modal Add/Edit Task -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="modalTitle">Thêm Task Mới</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="taskForm" onsubmit="saveTask(event)">
+                <div class="form-group">
+                    <label for="taskName">Tên task *</label>
+                    <input type="text" id="taskName" placeholder="Ví dụ: Xây dựng RAG Pipeline" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDesc">Mô tả</label>
+                    <textarea id="taskDesc" rows="3" placeholder="Mô tả chi tiết công việc..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskMember">Phân công *</label>
+                        <select id="taskMember" required>
+                            <option value="">Chọn người</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskPriority">Độ ưu tiên</label>
+                        <select id="taskPriority">
+                            <option value="low">🟢 Thấp</option>
+                            <option value="medium" selected>🟡 Trung bình</option>
+                            <option value="high">🔴 Cao</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskModule">Module</label>
+                        <select id="taskModule">
+                            <option value="">Chọn module</option>
+                            <option value="Frontend">Frontend</option>
+                            <option value="Backend">Backend</option>
+                            <option value="RAG">RAG Pipeline</option>
+                            <option value="ML/AI">ML/AI Models</option>
+                            <option value="DevOps">DevOps</option>
+                            <option value="Data">Data Pipeline</option>
+                            <option value="Design">Design</option>
+                            <option value="Docs">Documentation</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDeadline">Deadline</label>
+                        <input type="date" id="taskDeadline">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="taskStatus">Trạng thái</label>
+                    <select id="taskStatus">
+                        <option value="todo">📋 To Do</option>
+                        <option value="in-progress">🔨 In Progress</option>
+                        <option value="review">👀 Review</option>
+                        <option value="done">✅ Done</option>
+                    </select>
+                </div>
+                <input type="hidden" id="taskId" value="">
+                <div class="form-actions">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div class="modal-overlay" id="detailOverlay" onclick="closeDetail(event)">
+        <div class="modal modal-detail" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="detailTitle"></h2>
+                <button class="modal-close" onclick="closeDetail()">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+            <div class="form-actions">
+                <button class="btn btn-danger" id="detailDeleteBtn">🗑️ Xóa</button>
+                <button class="btn btn-primary" id="detailEditBtn">✏️ Chỉnh sửa</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
