@@ -1,7 +1,24 @@
 /* ========================================
    CS221 TASK BOARD — APP LOGIC
-   Drag & Drop + CRUD + localStorage
+   Firebase Realtime DB + Drag & Drop + CRUD
    ======================================== */
+
+// ─── Firebase Config ───
+const firebaseConfig = {
+    apiKey: "AIzaSyCWhKtptm1oYFxQCYHE-ZE8CmvPDEKViaA",
+    authDomain: "task-board-30c3a.firebaseapp.com",
+    databaseURL: "https://task-board-30c3a-default-rtdb.firebaseio.com",
+    projectId: "task-board-30c3a",
+    storageBucket: "task-board-30c3a.firebasestorage.app",
+    messagingSenderId: "967561410136",
+    appId: "1:967561410136:web:58ba6e15bac51591a03c2d",
+    measurementId: "G-R70PDXDR4S"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const tasksRef = db.ref('tasks');
 
 // ─── Team Members ───
 const MEMBERS = [
@@ -60,29 +77,71 @@ let tasks = [];
 let activeFilters = { members: [], modules: [] };
 let editingTaskId = null;
 let draggedId = null;
+let firebaseReady = false;
 
 // ─── Init ───
 document.addEventListener('DOMContentLoaded', () => {
-    loadTasks();
     renderTeamAvatars();
     renderMemberSelect();
     renderFilters();
-    renderBoard();
-    updateStats();
+    initFirebase();
 });
 
-function loadTasks() {
+// ─── Firebase Init & Real-time Listener ───
+function initFirebase() {
+    // Listen for real-time changes
+    tasksRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // Convert Firebase object to array
+            tasks = Object.values(data);
+        } else {
+            // First time: seed default tasks
+            tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+            saveTasksToFirebase();
+        }
+        firebaseReady = true;
+        renderBoard();
+        updateStats();
+    }, (error) => {
+        console.error('Firebase read error:', error);
+        // Fallback to localStorage if Firebase fails
+        loadTasksFromLocalStorage();
+        renderBoard();
+        updateStats();
+    });
+}
+
+function saveTasksToFirebase() {
+    // Save as object keyed by task id for efficient updates
+    const tasksObj = {};
+    tasks.forEach(t => { tasksObj[t.id] = t; });
+    tasksRef.set(tasksObj).catch(err => {
+        console.error('Firebase write error:', err);
+    });
+}
+
+function saveTaskToFirebase(task) {
+    // Update single task (more efficient)
+    tasksRef.child(task.id).set(task).catch(err => {
+        console.error('Firebase write error:', err);
+    });
+}
+
+function deleteTaskFromFirebase(taskId) {
+    tasksRef.child(taskId).remove().catch(err => {
+        console.error('Firebase delete error:', err);
+    });
+}
+
+// ─── LocalStorage Fallback ───
+function loadTasksFromLocalStorage() {
     const saved = localStorage.getItem('cs221_tasks');
     if (saved) {
         tasks = JSON.parse(saved);
     } else {
         tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-        saveTasks();
     }
-}
-
-function saveTasks() {
-    localStorage.setItem('cs221_tasks', JSON.stringify(tasks));
 }
 
 // ─── Render Team Avatars ───
@@ -281,8 +340,8 @@ function drop(e) {
     const task = tasks.find(t => t.id === id);
     if (task) {
         task.status = status;
-        saveTasks();
-        renderBoard();
+        // Sync to Firebase (real-time update for all users)
+        saveTaskToFirebase(task);
     }
 }
 
@@ -335,7 +394,7 @@ function saveTask(e) {
     const id = document.getElementById('taskId').value;
 
     if (id) {
-        // Edit
+        // Edit existing task
         const task = tasks.find(t => t.id === id);
         if (task) {
             task.name = name;
@@ -345,17 +404,17 @@ function saveTask(e) {
             task.module = module;
             task.deadline = deadline;
             task.status = status;
+            saveTaskToFirebase(task);
         }
     } else {
-        // Add
-        tasks.push({
+        // Add new task
+        const newTask = {
             id: 'task_' + Date.now(),
             name, desc, member, priority, module, deadline, status
-        });
+        };
+        saveTaskToFirebase(newTask);
     }
 
-    saveTasks();
-    renderBoard();
     closeModal();
 }
 
@@ -401,9 +460,7 @@ function showDetail(id) {
 
     document.getElementById('detailDeleteBtn').onclick = () => {
         if (confirm(`Xóa task "${task.name}"?`)) {
-            tasks = tasks.filter(t => t.id !== id);
-            saveTasks();
-            renderBoard();
+            deleteTaskFromFirebase(id);
             closeDetail();
         }
     };
