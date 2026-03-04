@@ -1,6 +1,6 @@
-# CS221 Task Board 🤖
+# vibe code🤖
 
-Bảng quản lý công việc dạng **Kanban Board** cho dự án CS221 — Hệ thống Agent Chatbot Đa Tác Vụ.
+Bảng quản lý công việc dạng **Kanban Board** cho vibe code  — Hệ thống Agent Chatbot Đa Tác Vụ.
 
 ## 🌐 Demo
 
