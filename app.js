@@ -18,7 +18,7 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const tasksRef = db.ref('tasks');
+const tasksRef = db.ref('tasks_new');
 
 // ─── Team Members ───
 const MEMBERS = [
@@ -99,7 +99,7 @@ function deleteTaskFromFirebase(taskId) {
 
 // ─── LocalStorage Fallback ───
 function loadTasksFromLocalStorage() {
-    const saved = localStorage.getItem('cs221_tasks');
+    const saved = localStorage.getItem('cs221_tasks_new');
     if (saved) {
         tasks = JSON.parse(saved);
     } else {
