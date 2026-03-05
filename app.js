@@ -5,7 +5,7 @@
 
 // ─── Firebase Config ───
 const firebaseConfig = {
-    apiKey: "AIzaSyCWhKtptm1oYFxQCYHE-ZE8CmvPDEKViaA",
+    apiKey: "AIzaSyBTPiX_dtJmTyRKW4ZACz4RKhKMFNCYNFY",
     authDomain: "task-board-30c3a.firebaseapp.com",
     databaseURL: "https://task-board-30c3a-default-rtdb.firebaseio.com",
     projectId: "task-board-30c3a",
